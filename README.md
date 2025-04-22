@@ -1,49 +1,82 @@
-## About Laravel Movie DB
+# Movie Management System Refactoring
 
-Ini adalah sistem database movie menggunakan laravel untuk mata kuliah Konstruksi dan Evolusi Perangkat Lunak Prodi Teknologi Rekayasa Perangkat Lunak Jurusan Teknologi Informasi Politeknik Negeri Padang.
+This document outlines the refactoring performed on the MovieController class in the tiMovie application to improve code quality, maintainability, and reduce duplication.
 
-Silahkan clone repository ini ke PC Anda.
-Jika Anda baru saja meng-clone repository proyek Laravel dan ingin menjalankan perintah migrasi, ada beberapa langkah yang perlu Anda lakukan terlebih dahulu. Berikut adalah langkah-langkahnya:
+## Refactoring Overview
 
-1. **Composer Install:**
-   Pastikan Anda telah menginstal Composer di sistem Anda. Kemudian, jalankan perintah berikut di terminal di direktori proyek Laravel Anda untuk menginstal dependensi:
+The MovieController class was refactored to address several issues:
 
-    composer install
+1. **Validation Code Duplication**: Extracted repeated validation logic into a centralized method
+2. **File Handling Logic**: Consolidated file upload, naming, and storage logic into a reusable method
 
-2. **Environment File:**
-   Duplikat file `.env.example` menjadi `.env` di direktori proyek Anda. Sesuaikan pengaturan database dan konfigurasi lainnya di file `.env` sesuai dengan kebutuhan Anda.
+## Refactoring Details
 
-    cp .env.example .env
+### 1. Validation Logic Refactoring
 
-3. **Generate Application Key:**
-   Laravel menggunakan kunci aplikasi untuk enkripsi data. Jalankan perintah berikut untuk menghasilkan kunci aplikasi:
+**Problem:**
+- Validation rules were duplicated across `store()` and `update()` methods
+- Slight differences in validation rules between create and update operations were handled with duplicated code
+- Changes to validation rules required updating multiple places
 
-    php artisan key:generate
+**Solution:**
+- Created a `getValidationRules()` private method that centralizes all validation rules
+- Added a parameter to conditionally adjust rules based on operation type (create vs update)
+- Implemented conditional logic for the `foto_sampul` field (required for new records, optional for updates)
+- Added ID validation only for new records
 
-4. **Set Database Connection:**
-   Pastikan bahwa pengaturan koneksi database di file `.env` sesuai dengan konfigurasi database Anda.
+**Benefits:**
+- Single source of truth for validation rules
+- Easier maintenance when validation requirements change
+- Clearer distinction between create and update validation requirements
+- Reduced code duplication
 
-   Contoh: Jika Anda membuat database dbmovie, maka di file `.env` ubahlah `DB_DATABASE=laravel` menjadi `DB_DATABASE=dbmovie`
+### 2. File Handling Refactoring
 
-6. **Run Migrations:**
-   Sekarang Anda dapat menjalankan perintah migrasi untuk membuat tabel-tabel database:
+**Problem:**
+- File upload logic was duplicated in both `store()` and `update()` methods
+- Inconsistent file extension handling (hardcoded as 'jpg' in `store()` but dynamically determined in `update()`)
+- Repeated file naming and storage logic
 
-    php artisan migrate
+**Solution:**
+- Created a `handleFileUpload()` private method to encapsulate all file handling logic
+- Consistently used the actual file extension from the uploaded file
+- Centralized the UUID generation for filenames
+- Reused the same method for both create and update operations
 
-    Perintah ini akan mengeksekusi semua migrasi yang terkandung di proyek Laravel ini.
+**Benefits:**
+- Consistent file handling across all operations
+- Eliminated the hardcoded file extension issue
+- Reduced code duplication
+- Simplified the main controller methods
 
-7. **Run Seeds (Opsional):**
-   Proyek ini menggunakan _seeding_ untuk mengisi basis data awal, jalankan perintah berikut:
+### 3. Additional Improvements
 
-    php artisan db:seed
+- **Improved Code Organization**: Added PHPDoc comments to improve code readability
+- **Better Variable Naming**: Used more descriptive variable names
+- **Structured Update Logic**: Created a separate `$updateData` array for clarity
+- **Conditional File Handling**: Only process file operations when needed
 
-    Perintah ini akan menjalankan seeder yang telah didefinisikan.
+## Implementation
 
-8. **Serve Aplikasi:**
-   Setelah langkah-langkah di atas selesai, Anda dapat menjalankan server pengembangan Laravel untuk melihat proyek Anda:
+The refactoring was implemented by:
 
-    php artisan serve
+1. Extracting common validation rules to a private method
+2. Creating a dedicated file upload handler method
+3. Updating the controller methods to use these new helper methods
+4. Adding appropriate documentation
 
-    Aplikasi akan berjalan di http://localhost:8000 secara default.
+## Future Improvement Opportunities
 
-_Credit by: Yori Adi Atma_
+While this refactoring addresses validation and file handling issues, future improvements could include:
+
+1. Implementing database transactions for data integrity
+2. Adding robust error handling for file operations
+3. Moving validation to dedicated Form Request classes
+4. Extracting file handling to a dedicated service class
+5. Implementing authorization checks
+6. Optimizing database queries
+7. Standardizing response patterns
+
+## Conclusion
+
+This refactoring improves the maintainability of the MovieController by reducing code duplication and centralizing common logic. The changes make the code more robust while maintaining all original functionality.
