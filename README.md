@@ -1,82 +1,82 @@
-# Movie Management System Refactoring
+# Refactoring Sistem Manajemen Film
 
-This document outlines the refactoring performed on the MovieController class in the tiMovie application to improve code quality, maintainability, and reduce duplication.
+Dokumen ini menguraikan refactoring yang dilakukan pada kelas MovieController dalam aplikasi tiMovie untuk meningkatkan kualitas kode, kemudahan perawatan, dan mengurangi duplikasi.
 
-## Refactoring Overview
+## Tinjauan Umum Refaktoring
 
-The MovieController class was refactored to address several issues:
+Kelas MovieController direfaktorisasi untuk mengatasi beberapa masalah:
 
-1. **Validation Code Duplication**: Extracted repeated validation logic into a centralized method
-2. **File Handling Logic**: Consolidated file upload, naming, and storage logic into a reusable method
+1. **Duplikasi Kode Validasi**: Mengekstrak logika validasi berulang ke dalam metode terpusat
+2. **Logika Penanganan File**: Mengkonsolidasi logika pengunggahan, penamaan, dan penyimpanan file ke dalam metode yang dapat digunakan kembali
 
-## Refactoring Details
+## Detail Refactoring
 
-### 1. Validation Logic Refactoring
+### 1. Refactoring Logika Validasi
 
-**Problem:**
-- Validation rules were duplicated across `store()` and `update()` methods
-- Slight differences in validation rules between create and update operations were handled with duplicated code
-- Changes to validation rules required updating multiple places
+**Masalah:**
+- Aturan validasi diduplikasi di seluruh metode `store()` dan `update()`
+- Sedikit perbedaan dalam aturan validasi antara operasi create dan update ditangani dengan kode yang diduplikasi
+- Perubahan pada aturan validasi memerlukan pembaruan di beberapa tempat
 
-**Solution:**
-- Created a `getValidationRules()` private method that centralizes all validation rules
-- Added a parameter to conditionally adjust rules based on operation type (create vs update)
-- Implemented conditional logic for the `foto_sampul` field (required for new records, optional for updates)
-- Added ID validation only for new records
+**Solusi:**
+- Membuat metode privat `getValidationRules()` yang memusatkan semua aturan validasi
+- Menambahkan parameter untuk menyesuaikan aturan secara kondisional berdasarkan jenis operasi (membuat vs memperbarui)
+- Menerapkan logika kondisional untuk kolom `foto_sampul` (diperlukan untuk catatan baru, opsional untuk pembaruan)
+- Menambahkan validasi ID hanya untuk catatan baru
 
-**Benefits:**
-- Single source of truth for validation rules
-- Easier maintenance when validation requirements change
-- Clearer distinction between create and update validation requirements
-- Reduced code duplication
+**Manfaat:**
+- Sumber kebenaran tunggal untuk aturan validasi
+- Pemeliharaan lebih mudah saat persyaratan validasi berubah
+- Perbedaan yang lebih jelas antara persyaratan validasi buat dan perbarui
+- Pengurangan duplikasi kode
 
-### 2. File Handling Refactoring
+### 2.Pemfaktoran Ulang Penanganan Berkas
 
-**Problem:**
-- File upload logic was duplicated in both `store()` and `update()` methods
-- Inconsistent file extension handling (hardcoded as 'jpg' in `store()` but dynamically determined in `update()`)
-- Repeated file naming and storage logic
+**Masalah:**
+- Logika pengunggahan berkas diduplikasi dalam metode `store()` dan `update()`
+- Penanganan ekstensi berkas tidak konsisten (dikodekan sebagai 'jpg' dalam `store()` tetapi ditentukan secara dinamis dalam `update()`)
+- Logika penamaan dan penyimpanan berkas berulang
 
-**Solution:**
-- Created a `handleFileUpload()` private method to encapsulate all file handling logic
-- Consistently used the actual file extension from the uploaded file
-- Centralized the UUID generation for filenames
-- Reused the same method for both create and update operations
+**Solusi:**
+- Membuat metode privat `handleFileUpload()` untuk merangkum semua logika penanganan file
+- Secara konsisten menggunakan ekstensi file aktual dari file yang diunggah
+- Memusatkan pembuatan UUID untuk nama file
+- Menggunakan kembali metode yang sama untuk operasi pembuatan dan pembaruan
 
-**Benefits:**
-- Consistent file handling across all operations
-- Eliminated the hardcoded file extension issue
-- Reduced code duplication
-- Simplified the main controller methods
+**Manfaat:**
+- Penanganan berkas yang konsisten di semua operasi
+- Menghilangkan masalah ekstensi berkas yang dikodekan secara keras
+- Mengurangi duplikasi kode
+- Menyederhanakan metode pengontrol utama
 
-### 3. Additional Improvements
+### 3. Peningkatan Tambahan
 
-- **Improved Code Organization**: Added PHPDoc comments to improve code readability
-- **Better Variable Naming**: Used more descriptive variable names
-- **Structured Update Logic**: Created a separate `$updateData` array for clarity
-- **Conditional File Handling**: Only process file operations when needed
+- **Peningkatan Organisasi Kode**: Menambahkan komentar PHPDoc untuk meningkatkan keterbacaan kode
+- **Penamaan Variabel yang Lebih Baik**: Menggunakan nama variabel yang lebih deskriptif
+- **Logika Pembaruan Terstruktur**: Membuat array `$updateData` terpisah untuk kejelasan
+- **Penanganan File Bersyarat**: Hanya memproses operasi file saat diperlukan
 
-## Implementation
+## Implementasi
 
-The refactoring was implemented by:
+Refaktorisasi diimplementasikan dengan:
 
-1. Extracting common validation rules to a private method
-2. Creating a dedicated file upload handler method
-3. Updating the controller methods to use these new helper methods
-4. Adding appropriate documentation
+1. Mengekstrak aturan validasi umum ke metode privat
+2. Membuat metode penanganan unggahan file khusus
+3. Memperbarui metode pengontrol untuk menggunakan metode pembantu baru ini
+4. Menambahkan dokumentasi yang sesuai
 
-## Future Improvement Opportunities
+## Peluang Peningkatan di Masa Depan
 
-While this refactoring addresses validation and file handling issues, future improvements could include:
+Meskipun pemfaktoran ulang ini mengatasi masalah validasi dan penanganan berkas, peningkatan di masa mendatang dapat mencakup:
 
-1. Implementing database transactions for data integrity
-2. Adding robust error handling for file operations
-3. Moving validation to dedicated Form Request classes
-4. Extracting file handling to a dedicated service class
-5. Implementing authorization checks
-6. Optimizing database queries
-7. Standardizing response patterns
+1. Menerapkan transaksi basis data untuk integritas data
+2. Menambahkan penanganan kesalahan yang kuat untuk operasi berkas
+3. Memindahkan validasi ke kelas Permintaan Formulir khusus
+4. Mengekstrak penanganan berkas ke kelas layanan khusus
+5. Menerapkan pemeriksaan otorisasi
+6. Mengoptimalkan kueri basis data
+7. Menstandarkan pola respons
 
-## Conclusion
+## Kesimpulan
 
-This refactoring improves the maintainability of the MovieController by reducing code duplication and centralizing common logic. The changes make the code more robust while maintaining all original functionality.
+Pemfaktoran ulang ini meningkatkan kemudahan pemeliharaan MovieController dengan mengurangi duplikasi kode dan memusatkan logika umum. Perubahan tersebut membuat kode lebih tangguh sekaligus mempertahankan semua fungsi asli.
